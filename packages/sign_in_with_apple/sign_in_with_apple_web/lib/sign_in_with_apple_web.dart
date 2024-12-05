@@ -29,6 +29,7 @@ class SignInWithApplePlugin extends SignInWithApplePlatform {
     String? state,
   }) async {
     try {
+      print('getAppleIDCredential, creating options');
       final options = SignInWithAppleInitOptions(
         clientId: webAuthenticationOptions!.clientId,
         redirectURI: webAuthenticationOptions.redirectUri.toString(),
@@ -43,9 +44,12 @@ class SignInWithApplePlugin extends SignInWithApplePlatform {
         nonce: nonce,
         usePopup: true,
       );
+      print('getAppleIDCredential, initializing with $options');
 
       init(options);
+      print('getAppleIDCredential, initialized. Getting response.');
       final response = await signIn().toDart;
+      print('getAppleIDCredential, got response $response');
 
       return AuthorizationCredentialAppleID(
         authorizationCode: response.authorization.code,
@@ -57,9 +61,12 @@ class SignInWithApplePlugin extends SignInWithApplePlatform {
         userIdentifier: null,
       );
     } catch (e) {
+      print('getAppleIDCredential, error: $e');
       // error per https://developer.apple.com/documentation/sign_in_with_apple/signinerrori
       final errorProp = (e as SignInErrorI).error;
+      print('getAppleIDCredential, errorProp: $errorProp');
       final errorCode = errorProp is String ? errorProp : 'UNKNOWN_SIWA_ERROR';
+      print('getAppleIDCredential, errorCode: $errorCode');
 
       throw SignInWithAppleCredentialsException(
         message: 'Authentication failed with $errorCode',
